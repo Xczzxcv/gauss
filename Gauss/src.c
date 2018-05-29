@@ -1,20 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
-#include <malloc.h>
 #define N 4
 #define MAX_NUM_LENGTH 10 //with minus
 
+struct frac{ //fraction - äğîáü, ëîë
+    int numerator; //÷èñëèòåëü
+    int denominator; //çíàìåíàòåëü
+};
+
 int** readM();
-void showM(int** ptM, int size);
+void show_intM(int** ptM, int sizeM);
 int** cutM(int row, int col, int** ptM);
+int find(int* mass, int size, int quest);
+void sum_strM(int str1, int str2, int coeff, int** ptM, int sizeM);
+frac** intM_to_fracM(int sizeM, int** ptM);
+void show_fracM(frac** pfrM, int sizeM);
 
 int main(){
-    ptM = readM();
+    int **ptM = readM();
     if (ptM != NULL){
-        showM(ptM, N);
+        //sum_strM(0, 1, -2, ptM, N);
+        show_intM(ptM, N);
+        intM_to_fracM()
+    }
     else
         printf("ptM is NULL.\n");
+
 }
 
 int** readM(){
@@ -99,8 +111,8 @@ int** readM(){
     return ptM;
 }
 
-void showM(int** ptM, int size){
-    printf("Showing Matrix...\n\n\n");
+void show_intM(int** ptM, int sizeM){
+    printf("Showing Matrix of integers...\n\n\n");
     int i, j;
     for(i=0;i<size;i++){
         for(j=0;j<size;j++)
@@ -126,35 +138,48 @@ int** cutM(int row, int col, int** ptM){
     }
     return ptcM;
 }
-//————//——————//—————————//——————————//———//
-void func(int **ptM)
-{
-    int i, j,
-        **A = ptM, MASS[N][N];
-    int key = 0;
-    int key2 = 2;
-    for (i = 0; i < N - 1; ++i) {
-      for (j = 0; j < N - 1; ++j) {
-        if (j < key) {
-          if (i < key2) {
-            MASS[i][j] = A[i][j];
-            printf("%3i ", MASS[i][j]);
-          } else {
-            MASS[i][j] = A[i + 1][j];
-            printf("%3i ", MASS[i][j]);
-          }
-        } else {
-          if (i < key2) {
-            MASS[i][j] = A[i][j + 1];
-            printf("%3i ", MASS[i][j]);
-          } else {
-            MASS[i][j] = A[i + 1][j + 1];
-            printf("%3i ", MASS[i][j]);
-          }
-        }
-      }
-      puts("\n");
-    }
 
-    return 0;
+int find(int* mass, int size, int quest){
+    int i;
+    for(i = 0; i<size;i++)
+        if (mass[i] == quest)
+            return i;
+    return -1;
+}
+
+void sum_strM(int str1, int str2, int coeff, int** ptM, int sizeM){
+
+frac** intM_to_fracM(int sizeM, int** ptM){
+    int i, j;
+    frac **ptfrM = calloc(sizeM, sizeof(frac*));
+    for (i=0;i<sizeM;i++)
+        for (j=0;j<sizeM;j++){
+            ptfrM[i][j].numerator = ptM[i][j];
+            pfrM[i][j].denominator = 1;
+        }
+    return ptfrM;
+
+void show_fracM(frac** pfrM, int sizeM){
+    printf("Showing Matrix of fractions...\n\n\n");
+    int i, j;
+    for(i=0;i<sizeM;i++){
+        for(j=0;j<sizeM;j++)
+            printf("d%/d ", pfrM[i][j].numerator, pfrM[i][j].denominator);
+        printf("\n");
+    }
+}
+
+    int i, j;
+    frac **pfrM = calloc(sizeM, sizeof(frac*)); // p_frM - pointer to fraction Matrix
+    for (i=0;i<sizeM;i++){
+        pfrM[i] = calloc(sizeM, sizeof(frac));
+        for(j=0;j<sizeM;j++){
+            pfrM[i][j].denominator = ptM[i][j];
+            pfrM[i][j].numerator = 1;
+        }
+    }
+}
+    int i;
+    for (i=0;i<sizeM;i++)
+        ptM[str1][i] += ptM[str2][i] * coeff;
 }
