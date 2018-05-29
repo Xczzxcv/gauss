@@ -4,10 +4,10 @@
 #define N 4
 #define MAX_NUM_LENGTH 10 //with minus
 
-struct frac{ //fraction - дробь, лол
+typedef struct {
     int numerator; //числитель
     int denominator; //знаменатель
-};
+}frac; //fraction - дробь, лол
 
 int** readM();
 void show_intM(int** ptM, int sizeM);
@@ -22,7 +22,8 @@ int main(){
     if (ptM != NULL){
         //sum_strM(0, 1, -2, ptM, N);
         show_intM(ptM, N);
-        intM_to_fracM()
+        frac** pfrM = intM_to_fracM(N, ptM);
+        show_fracM(pfrM, N);
     }
     else
         printf("ptM is NULL.\n");
@@ -114,8 +115,8 @@ int** readM(){
 void show_intM(int** ptM, int sizeM){
     printf("Showing Matrix of integers...\n\n\n");
     int i, j;
-    for(i=0;i<size;i++){
-        for(j=0;j<size;j++)
+    for(i=0;i<sizeM;i++){
+        for(j=0;j<sizeM;j++)
             printf("%d ", ptM[i][j]);
         printf("\n");
     }
@@ -149,13 +150,15 @@ int find(int* mass, int size, int quest){
 
 frac** intM_to_fracM(int sizeM, int** ptM){
     int i, j;
-    frac **ptfrM = calloc(sizeM, sizeof(frac*));
-    for (i=0;i<sizeM;i++)
+    frac **pfrM = calloc(sizeM, sizeof(frac*));
+    for (i=0;i<sizeM;i++){
+        pfrM[i] = calloc(sizeM, sizeof(frac));
         for (j=0;j<sizeM;j++){
-            ptfrM[i][j].numerator = ptM[i][j];
+            pfrM[i][j].numerator = ptM[i][j];
             pfrM[i][j].denominator = 1;
         }
-    return ptfrM;
+    }
+    return pfrM;
 }
 
 void show_fracM(frac** pfrM, int sizeM){
@@ -163,7 +166,7 @@ void show_fracM(frac** pfrM, int sizeM){
     int i, j;
     for(i=0;i<sizeM;i++){
         for(j=0;j<sizeM;j++)
-            printf("d%/d ", pfrM[i][j].numerator, pfrM[i][j].denominator);
+            printf("%d/%d ", pfrM[i][j].numerator, pfrM[i][j].denominator);
         printf("\n");
     }
 }
