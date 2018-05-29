@@ -147,8 +147,6 @@ int find(int* mass, int size, int quest){
     return -1;
 }
 
-void sum_strM(int str1, int str2, int coeff, int** ptM, int sizeM){
-
 frac** intM_to_fracM(int sizeM, int** ptM){
     int i, j;
     frac **ptfrM = calloc(sizeM, sizeof(frac*));
@@ -158,6 +156,7 @@ frac** intM_to_fracM(int sizeM, int** ptM){
             pfrM[i][j].denominator = 1;
         }
     return ptfrM;
+}
 
 void show_fracM(frac** pfrM, int sizeM){
     printf("Showing Matrix of fractions...\n\n\n");
@@ -169,16 +168,7 @@ void show_fracM(frac** pfrM, int sizeM){
     }
 }
 
-    int i, j;
-    frac **pfrM = calloc(sizeM, sizeof(frac*)); // p_frM - pointer to fraction Matrix
-    for (i=0;i<sizeM;i++){
-        pfrM[i] = calloc(sizeM, sizeof(frac));
-        for(j=0;j<sizeM;j++){
-            pfrM[i][j].denominator = ptM[i][j];
-            pfrM[i][j].numerator = 1;
-        }
-    }
-}
+void sum_strM(int str1, int str2, int coeff, int** ptM, int sizeM){
     int i;
     for (i=0;i<sizeM;i++)
         ptM[str1][i] += ptM[str2][i] * coeff;
