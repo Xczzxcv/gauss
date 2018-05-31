@@ -13,31 +13,40 @@ int** readM();
 void show_intM(int** ptM, int sizeM);
 int** cutM(int row, int col, int** ptM);
 int find(int* mass, int size, int quest);
-void sum_strM(int str1, int str2, int coeff, int** ptM, int sizeM);
+void sum_strM(int str1, int str2, frac coeff, frac** pfrM, int sizestr);
 frac** intM_to_fracM(int sizeM, int** ptM);
 void show_fracM(frac** pfrM, int rows, int cols);
 void extendingM(frac** pfrM, int sizeM);
 void zeroing(frac** pfrM, int rows, int cols); //size - num of rows
 int eukl_NOD(int a, int b);
 void swap_strM(frac** pfrM, int str1, int str2);
-void frac_reduc(frac** frac_ptr_mass, int mass_size); //сокращение дробей
+void reduc_frac(frac** frac_ptr_mass, int mass_size); //сокращение дробей
 frac sum_frac(frac fr1, frac fr2);
+frac div_frac(frac fr1, frac fr2);
+frac mult_frac(frac fr1, frac fr2);
+frac create_frac(int num, int denom);
 
 int main(){
     int **ptM = readM();
     if (ptM != NULL){
-        //sum_strM(0, 1, -2, ptM, N);
-        show_intM(ptM, N);
-        frac** pfrM = intM_to_fracM(N, ptM);
-        extendingM(pfrM, N);
+        /*
+        sum_strM(0, 1, -2, ptM, N);
         frac A, B;
-        A.num = 14323;
-        A.denom = 164577;
-        B.num = 51234;
-        B.denom = 444444;
+        A.num = 11;
+        A.denom = 18;
+        B.num = 2;
+        B.denom = 9;
         A = sum_frac(A, B);
         printf("exprmt %d/%d\n", A.num, A.denom);
-        zeroing(pfrM, N, N*2);
+        */
+        show_intM(ptM, N);
+        printf("HERE WE GO\n");
+        frac** pfrM = intM_to_fracM(N, ptM);
+        printf("CONVERTED\n");
+        extendingM(pfrM, N);
+        printf("EXTENDED\n");
+        show_fracM(pfrM, N, N*2);
+        zeroing(pfrM, N, N*2); // ATTENTION TO SECOND N
         show_fracM(pfrM, N, N*2);
     }
     else
@@ -176,19 +185,26 @@ frac** intM_to_fracM(int sizeM, int** ptM){
 }
 
 void show_fracM(frac** pfrM, int rows, int cols){
-    printf("Showing Matrix of fractions...\n\n\n");
+    printf("\nShowing Matrix of fractions...\n");
     int i, j;
     for(i=0;i<rows;i++){
         for(j=0;j<cols;j++)
             printf("%d/%d ", pfrM[i][j].num, pfrM[i][j].denom);
         printf("\n");
     }
+    printf("\n");
 }
 
-void sum_strM(int str1, int str2, int coeff, int** ptM, int sizeM){
+void sum_strM(int str1, int str2, frac coeff, frac** pfrM, int sizestr){
+    printf("sum %d and %d\ncoeff %d/%d sizestr %d\n", str1, str2, coeff.num, coeff.denom, sizestr);
+    show_fracM(pfrM, N, sizestr);
     int i;
-    for (i=0;i<sizeM;i++)
-        ptM[str1][i] += ptM[str2][i] * coeff;
+    for (i=0;i<sizestr;i++){
+        printf("BFR: %d/%d and %d/%d ", pfrM[str1][i].num, pfrM[str1][i].denom, pfrM[str2][i].num, pfrM[str2][i].denom);
+        pfrM[str1][i] = sum_frac(pfrM[str1][i], div_frac(pfrM[str2][i], coeff));
+        printf("AFR: %d/%d and %d/%d\n", pfrM[str1][i].num, pfrM[str1][i].denom, pfrM[str2][i].num, pfrM[str2][i].denom);
+    }
+        //pfrM[str1][i].num += pfrM[str2][i].num * coeff;
 }
 
 void extendingM(frac** pfrM, int sizeM){
@@ -209,46 +225,17 @@ void extendingM(frac** pfrM, int sizeM){
     }
 }
 
-void zeroing(frac** pfrM, int rows, int cols){
-    int i, j, IT = -1;
-    for (i=0;i<rows;i++){
-        if (pfrM[i][0].num == 1){
-            printf("IT %d\n", i);
-            IT = i;
-            break;
-        }
-    }
-    if (IT != -1 && IT != 0)
-        swap_strM(pfrM, 0, IT);
-    else if (IT == -1){
-        for(i=1;i<rows;i++)
-            if(eukl_NOD(pfrM[i][0].num, pfrM[0][0].num) == pfrM[0][0].num)
-                IT = i;
-        if (IT != -1)
-            ;//sum_strM(0, IT, pfrM[IT][0].num);
-    }
-    int coeff = pfrM[0][0].num;
-    for (i=0;i<cols;i++){
-        pfrM[0][i].denom *= coeff;
-
-    for (i=1;i<rows;i++){
-        for (j=0;j<cols;j++)
-            pfrM[i][j].denom = 666;
-    }
-
-//for (j=0;j<sizeM;j++)
-
-
-    }
-}
-
 int eukl_NOD(int a, int b){
+    //printf("eukl start with %d %d and ", a, b);
+    a = abs(a);
+    b = abs(b);
     while (a != 0 && b != 0){
         if (a > b)
             a = a % b;
         else
             b = b % a;
     }
+    //printf("end with %d\n", a+b);
     return a + b;
 }
 
@@ -258,26 +245,144 @@ void swap_strM(frac** pfrM, int str1, int str2){
     pfrM[str2] = box;
 }
 
-void frac_reduc(frac** frac_ptr_mass, int mass_size){
+void reduc_frac(frac** frac_ptr_mass, int mass_size){
     int i, NOD;
     for (i=0;i<mass_size;i++){
-        printf("red input: %d/%d\t", frac_ptr_mass[i][0].num, frac_ptr_mass[i][0].denom);
+        //printf("reduc input: %d/%d\t", frac_ptr_mass[i][0].num, frac_ptr_mass[i][0].denom);
         NOD = eukl_NOD(frac_ptr_mass[i][0].num, frac_ptr_mass[i][0].denom);
         frac_ptr_mass[i][0].num /= NOD;
         frac_ptr_mass[i][0].denom /= NOD;
-        printf("result: %d/%d\n", frac_ptr_mass[i][0].num, frac_ptr_mass[i][0].denom);
+        //printf("result: %d/%d\n", frac_ptr_mass[i][0].num, frac_ptr_mass[i][0].denom);
     }
 }
 
 frac sum_frac(frac fr1, frac fr2){
-    frac* mass[] = {&fr1, &fr2};
-    frac_reduc(mass, 2);
-    printf("test %d %d\n", fr1.denom, fr2.denom);
     if (fr1.denom == fr2.denom)
         fr1.num += fr2.num;
     else{
         fr1.num = fr1.num * fr2.denom + fr2.num * fr1.denom;
         fr1.denom *= fr2.denom;
     }
+    frac* mass[] = {&fr1};
+    reduc_frac(mass, 1);
     return fr1;
 }
+
+frac div_frac(frac fr1, frac fr2){
+    if (fr2.num == 0){
+        printf("Divison by zero.\n");
+        exit(EXIT_FAILURE);
+    }
+    fr1.num *= fr2.denom;
+    fr1.denom *= fr2.num;
+    frac* mass[] = {&fr1};
+    reduc_frac(mass, 1);
+    if(fr1.denom < 0){
+        fr1.num = -fr1.num;
+        fr1.denom = -fr1.denom;
+    }
+    return fr1;
+}
+
+frac mult_frac(frac fr1, frac fr2){
+    fr1.num *= fr2.num;
+    fr1.denom *= fr2.denom;
+    frac* mass[] = {&fr1};
+    reduc_frac(mass, 1);
+    return fr1;
+}
+
+frac create_frac(int num, int denom){
+    frac box;
+    box.num = num;
+    box.denom = denom;
+    return box;
+}
+
+void zeroing(frac** pfrM, int rows, int cols){
+    int i, j, k,
+        IT = -1;
+
+    /*
+    for (i=0;i<rows;i++){
+        if (pfrM[i][0].num == 1){
+            IT = i;
+            printf("IT1 %d\n", i);
+            break;
+        }
+    }
+    if (IT != -1 && IT != 0){
+        printf("swap start ");
+        swap_strM(pfrM, 0, IT);
+        printf("swap end\n");
+    }
+    else if (IT == -1){
+        for(i=1;i<rows;i++)
+            if((eukl_NOD(pfrM[i][0].num, pfrM[0][0].num) == pfrM[0][0].num) && (pfrM[i][0].num != -pfrM[0][0].num)){
+                IT = i;
+                printf("IT2 %d\n", IT);
+            }
+        printf("SHa sum budet OOOO\n");
+        if (IT != -1)
+            if (pfrM[IT][0].num > pfrM[0][0].num)
+                sum_strM(0, IT, div_frac(pfrM[IT][0], pfrM[0][0]), pfrM, N*2);
+            else if (pfrM[IT][0].num < pfrM[0][0].num)
+                sum_strM(0, IT, div_frac(pfrM[0][0], pfrM[IT][0]), pfrM, N*2);
+            else{
+                printf("IT'S START OF END\n");
+                printf("Smth goes wrong.\n [IT][0]num %d IT %d\n[0][0]num %d\n", pfrM[IT][0].num, IT, pfrM[0][0].num);
+                exit(EXIT_FAILURE);
+            }
+        printf("VSE(((99\n");
+    }
+
+    if (pfrM[i][i].num/pfrM[i][i].denom != 1){
+        int coeff = pfrM[i][i].num;
+        printf("coeff 1/%d\n", coeff);
+        frac box;
+        box.denom = 1;
+        box.num = coeff;
+        for (i=0;i<cols;i++){
+            printf("withBOX before %d/%d", pfrM[0][i].num, pfrM[0][i].denom);
+            pfrM[0][i] = div_frac(pfrM[0][i], box);
+            printf("  after %d/%d\n", pfrM[0][i].num, pfrM[0][i].denom);
+        }
+    }
+    */
+
+
+    printf("BEFORE FINAL MYASO\n");
+    show_fracM(pfrM, N, N*2);
+    frac cff;
+    for (i=0;i<cols/2;i++){ //ATTENTION HERE TOO
+        for (j=0;j<rows;j++){
+        printf("RwCl %d %d\n", j, i);
+            if (j != i){
+                printf("BFRCFF %d/%d %d/%d\t", pfrM[i][i].num, pfrM[i][i].denom, pfrM[j][i].num,
+                       pfrM[j][i].denom);
+                if (pfrM[j][i].num == 0)
+                    continue;
+                cff = div_frac(pfrM[i][i], pfrM[j][i]);
+                printf("CFF %d/%d\n", cff.num, cff.denom);
+                //printf("CFF %d/%d %d/%d %d/%d\n", pfrM[i][i].num, pfrM[i][i].denom, pfrM[j][i].num,
+                //       pfrM[j][i].denom, cff.num, cff.denom);
+                cff.num = -cff.num; //for vychitanie
+                sum_strM(j, i, cff, pfrM, N*2);
+                //pfrM[i][j] = mult_frac(pfrM[i][j], cff);
+                /*
+                cf = (float)coe.num/coe.denom;
+                if (cf-(int)cf  != 0){
+                    printf("cf %d %d %f\n", coe.num, coe.denom, cf);
+                }
+                */
+                //sum_strM(j, i, , pfrM, N*2);
+            }
+        }
+    }
+    for(i=0;i<rows;i++){
+        cff = div_frac(create_frac(1, 1), pfrM[i][i]);
+        for (j=0;j<cols;j++)
+            pfrM[i][j] = mult_frac(pfrM[i][j], cff);
+    }
+}
+//обязательно проверить что будет если в клетке 1 1 2 2 итд будет 0
