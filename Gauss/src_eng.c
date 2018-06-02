@@ -42,25 +42,23 @@ int main(){
         printf("HERE WE GO\n\n");
         frac** pfrM = intM_to_fracM(N, ptM);
         extendingM(pfrM, N);
-        //show_fracM(pfrM, N, N*2, "Перед началом:");
         zeroing(pfrM, N, N*2);
         make_invM(pfrM, N, N*2); //sizes of extended Matrix
         show_fracM(pfrM, N, N, "And finally, we have the Matrix:\n");
     }
     else
         printf("ptM is NULL.\n");
-    //printf("в конце составить массив всех знаменателей\n и найти общий (дополнительно домножив нужные дроби/строки),\n затем вынести его перед матрицей\n");
 }
 
 int** readM(){
     char answer; //'f' - file or 'c' - console
     printf("Where is Matrix will be taken from?(FILE(f/c)CONSOLE)\n");
     scanf("%c", &answer);
-    int **ptM = calloc(N, sizeof(int*));
+    int **ptM = malloc(N * sizeof(int*));
     int i, j, k, num_cntr = 0;
     if(answer == 'c'){
         for(i=0;i<N;i++){
-            ptM[i] = calloc(N, sizeof(int));
+            ptM[i] = malloc(N * sizeof(int));
             for(j=0;j<N;j++){
                 printf("Enter %d %d:", i, j);
                 scanf("%d", &ptM[i][j]);
@@ -78,44 +76,25 @@ int** readM(){
         if (FwithM != NULL){
             printf("\tReading from file...\n");
             for(i=0;i<N;i++){
-                //printf("\tnew calloc %d(i) %d(ptM[i])\n", i, ptM[i]);
-                ptM[i] = calloc(N, sizeof(int));
-                //printf("%d(ptM[i])\n", ptM[i]);
-                //printf("\tnew string\n");
+                ptM[i] = malloc(N * sizeof(int));
                 num_cntr = 0;
                 for(j=0;num_cntr<N;j++){ //N+1 because of \n in the end of every string
                     symb = fgetc(FwithM);
-                    //printf("new symbol!\n");
                     if ((symb >= 48 && symb <= 57) || symb ==45){
-                        if (fst_c_of_n == -1){//45 - '-', 48 - '0', 57 - '9', 10 - '\n'
+                        if (fst_c_of_n == -1)//45 - '-', 48 - '0', 57 - '9', 10 - '\n'
                             fst_c_of_n = j;
-                            //printf("fst_c_of_n now is %d(j)\n", j);
-                        }
-                        //printf("bx inst: %c %d(j-fst_c_of_n) %d(j) %d(fst_c_of_n)\n", symb, j-fst_c_of_n, j, fst_c_of_n);
                         box[j-fst_c_of_n] = symb;
                     }
                     else{
                         ptM[i][num_cntr] = atoi(box);
-                        //printf("atoi ptM: %d %d %d\n", ptM[i][num_cntr], i, num_cntr);
                         num_cntr++;
-                        //printf("num_cntr++\n");
 
-                        //printf("box: ");
-                        for (k=0;k<MAX_NUM_LENGTH;k++){
-                            //printf("%c", box[k]);
+                        for (k=0;k<MAX_NUM_LENGTH;k++)
                             box[k] = 't';
-                        }
-                        //printf("\n");
 
                         fst_c_of_n = -1;
                     }
             }
-            /*
-            printf("this (%d) string of M:", i);
-            for(k=0;k<N;k++)
-                printf(" %d", ptM[i][k]);
-            printf("\n");
-            */
         }
     }
         else{
@@ -150,9 +129,9 @@ int** cutM(int row, int col, int** ptM){
     int i, j,
         rec_cntr = 0,
         ctN = N - 1, //cuted N
-        **ptcM = calloc(ctN, sizeof(int*)); // pointer to cuted Matrix
+        **ptcM = malloc(ctN * sizeof(int*)); // pointer to cuted Matrix
     for (i=0;i<N;i++){
-        ptcM[i] = calloc(ctN, sizeof(int));
+        ptcM[i] = malloc(ctN * sizeof(int));
         for(j=0;j<N;j++){
             if (i != row && j != col){
                 ptcM[rec_cntr / ctN][rec_cntr % ctN] = ptM[i][j];
@@ -184,23 +163,18 @@ int checking_det(int** ptM, int sizeM){
             minor = checking_det(cutM(0, j, ptM), sizeM-1);
             box = det;
             det += cff * ptM[0][j] * minor;
-            //printf("%d\t%d\t%d = %d -> %d\n", ptM[0][j], cff, minor, box, det);
-            //show_intM(ptM, sizeM, " ");
         }
     }
-    else{
+    else
         det = ptM[0][0] * ptM[1][1] - ptM[0][1] * ptM[1][0];
-        //printf("%d\tnea\t%d\n", sizeM, det);
-        //show_intM(ptM, sizeM, " ");
-    }
     return det;
 }
 
 frac** intM_to_fracM(int sizeM, int** ptM){
     int i, j;
-    frac **pfrM = calloc(sizeM, sizeof(frac*));
+    frac **pfrM = malloc(sizeM * sizeof(frac*));
     for (i=0;i<sizeM;i++){
-        pfrM[i] = calloc(sizeM, sizeof(frac));
+        pfrM[i] = malloc(sizeM * sizeof(frac));
         for (j=0;j<sizeM;j++){
             pfrM[i][j].num = ptM[i][j];
             pfrM[i][j].denom = 1;
@@ -225,13 +199,9 @@ void show_fracM(frac** pfrM, int rows, int cols, char* text){
 }
 
 void sum_strM(int str1, int str2, frac coeff, frac** pfrM, int sizestr){
-    //printf("sum %d and %d\ncoeff %d/%d sizestr %d\n", str1, str2, coeff.num, coeff.denom, sizestr);
-    //show_fracM(pfrM, N, sizestr);
     int i;
     for (i=0;i<sizestr;i++){
-        //printf("BFR: %d/%d and %d/%d ", pfrM[str1][i].num, pfrM[str1][i].denom, pfrM[str2][i].num, pfrM[str2][i].denom);
         pfrM[str1][i] = sum_frac(pfrM[str1][i], div_frac(pfrM[str2][i], coeff));
-        //printf("AFR: %d/%d and %d/%d\n", pfrM[str1][i].num, pfrM[str1][i].denom, pfrM[str2][i].num, pfrM[str2][i].denom);
     }
 }
 
@@ -331,18 +301,14 @@ void zeroing(frac** pfrM, int rows, int cols){
     for (i=0;i<cols/2;i++){
         if (pfrM[i][i].num == 0)
             for (k=0;k<rows;k++)
-                if /*(pfrM[k][k].num != 0 &&*/ (pfrM[k][i].num!= 0){
-                    //sum_strM(i, k, create_frac(2, 1), pfrM, cols);
+                if (pfrM[k][i].num!= 0){
                     swap_strM(i, k, pfrM);
                     printf("We just have swaped %d и %d strings.\n", k+1, i+1);
                     show_fracM(pfrM, rows, cols, "The Matrix after the swap:\n");
-                    //getch();
                     goto vse_zanovo;
                 }
         for (j=0;j<rows;j++){
-        //printf("RwCl %d %d\n", j, i);
             if (j != i){
-                //printf("BFRCFF %d/%d %d/%d\n", pfrM[i][i].num, pfrM[i][i].denom, pfrM[j][i].num, pfrM[j][i].denom);
                 if (pfrM[j][i].num == 0)
                     continue;
                 cff = div_frac(pfrM[i][i], pfrM[j][i]);
