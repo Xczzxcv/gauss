@@ -27,6 +27,7 @@ frac div_frac(frac fr1, frac fr2);
 frac mult_frac(frac fr1, frac fr2);
 frac create_frac(int num, int denom);
 void checking_det_det(int** ptM, int sizeM);
+void zero_issue(int problem_str, frac** pfrM, int rows, int cols);
 
 int main(){
     int **ptM = readM();
@@ -299,14 +300,10 @@ void zeroing(frac** pfrM, int rows, int cols){
 
     vse_zanovo:
     for (i=0;i<cols/2;i++){
-        if (pfrM[i][i].num == 0)
-            for (k=0;k<rows;k++)
-                if (pfrM[k][i].num!= 0){
-                    swap_strM(i, k, pfrM);
-                    printf("We just have swaped %d è %d strings.\n", k+1, i+1);
-                    show_fracM(pfrM, rows, cols, "The Matrix after the swap:\n");
-                    goto vse_zanovo;
-                }
+        if (pfrM[i][i].num == 0){
+            zero_issue(i, pfrM, rows, cols);
+            goto vse_zanovo;
+        }
         for (j=0;j<rows;j++){
             if (j != i){
                 if (pfrM[j][i].num == 0)
@@ -336,5 +333,17 @@ void make_invM(frac** pfrM, int rows, int cols){
         for (j=true_size;j<cols;j++)
             box[j-true_size] = pfrM[i][j];
         pfrM[i] = box;
+    }
+}
+
+void zero_issue(int problem_str, frac** pfrM, int rows, int cols){
+    int k;
+    for (k=0;k<rows;k++){
+        printf("swap_loop %d %d %d\n", problem_str, k, pfrM[k][problem_str].num);
+        if (pfrM[k][problem_str].num != 0 && pfrM[problem_str][k].num != 0){
+            swap_strM(problem_str, k, pfrM);
+            printf("We just have swaped %d è %d strings.\n", k+1, problem_str+1);
+            show_fracM(pfrM, rows, cols, "The Matrix after the swap:\n");
+        }
     }
 }
