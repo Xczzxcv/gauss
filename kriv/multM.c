@@ -1,21 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
 #define N 4
 
 int** create_randM(int rows, int cols, int from, int to);
-int** multiply_matrix (int **A, int **B, int rowsA, int colsA, int rowsB, int colsB);
-void show_intM(int** ptM, int sizeM, char* text);
+int** multiply_matrix(int **A, int **B, int rowsA, int colsA, int rowsB, int colsB);
+void show_intM(int** ptM, int rows, int cols, char* text);
 
-int main() {
+int main(){
     srand(time(NULL));
     int **A = create_randM(N, N, -10, 10),
-        **B = create_randM(N, N, -10, 10);
-    show_intM(A, N, "");
-    show_intM(B, N, "");
-    int **resM = multiply_matrix(A, B, N, N, N, N);
-    show_intM(resM, N, "");
+        **B = create_randM(N, 1, -10, 10);
+    show_intM(A, 1, N, "");
+    show_intM(B, N, 1, "");
+    int **resM = multiply_matrix(A, B, 1, N, N, 1);
+    show_intM(resM, 1, 1, "");
     return 0;
 }
 
@@ -49,15 +48,15 @@ int** create_randM(int rows, int cols, int from, int to){
     return M;
 }
 
-void show_intM(int** ptM, int sizeM, char* text){
+void show_intM(int** ptM, int rows, int cols, char* text){
     if (text == "")
         printf("\nThe Matrix of integers:\n");
     else{
         printf("%s", text);
     }
     int i, j;
-    for(i=0;i<sizeM;i++){
-        for(j=0;j<sizeM;j++)
+    for(i=0;i<rows;i++){
+        for(j=0;j<cols;j++)
             printf("%d ", ptM[i][j]);
         printf("\n");
     }
