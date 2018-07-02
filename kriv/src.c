@@ -8,20 +8,34 @@
 //приведение подобных
 char STRING[] = "x^2+2*x*y+y^2+2*rt[2]*x+6*rt[2]*y+16=0"; //1.2
 
-int find_same_term(int ind_start, int num_elt, char** term, char** sprt_str){
-    int i;
-    for(i=ind_start;i<num_elt;i++)
-        ;//for()
+int* find_same_term(int ind_start, int num_elt, int len_term, char** term, char** sprt_str){
+    int i, j,
+        arr_size = (num_elt - ind_start) / len_term + 1,
+        arr_cntr = 0,
+        *answers = calloc(arr_size, sizeof(int));
+    printf("\t\tind_start: |%d|\n", ind_start);
+    printf("\t\tnum_elt: |%d|\n", num_elt);
+    printf("\t\tlen_term: |%d|\n", len_term);
+    printf("\t\tARRSIZE: |%d|\n", arr_size);
+    for(i=ind_start;i<num_elt;i++){
+        for(j=0;j<len_term;j++)
+            if(strcmp(term[j], sprt_str[i+j]))
+                break;
+        answers[arr_cntr] = i;
+        arr_cntr++;
+    }
+    return answers;
 }
 char** slicing(int from, int to, char** sprt_str);
 int num_chrs(char* str, char* chrs);
 char** separating(char* str, int* size_sep_str);
 void reduc(char** sprt_str, int num_elt){ // privedenie podobnyx
-    int i,
-        ind_next_same_term = -2,
+    int i, j,
+        ind_next_same_term = -1,
         end_of_term = -1,
         start_of_term = -1, // term is slagaemoe, pohodu
-        buff_cntr = 0;
+        buff_cntr = 0,
+        *arr_ind;
     char **buff,
         list_of_vars[] = "xy";
     for(i=0;i<num_elt;i++){
@@ -30,11 +44,11 @@ void reduc(char** sprt_str, int num_elt){ // privedenie podobnyx
             puts("if");
             buff = slicing(start_of_term, i-1, sprt_str);
             end_of_term = i-1;
-            /*
-            do{
-                find_same_term()
-            }while(ind_next_same_term != -1);
-            */
+            arr_ind = find_same_term(i+1, num_elt, end_of_term-start_of_term+1, buff, sprt_str);
+//            for(j=0;j<;j++){
+            //for(j=0;arr_ind[j]!=0;j++){
+
+  //          }
             printf("%d %d %p\n", start_of_term, i-1, buff);
             printf("\t\t");
             for(int j=0;j<end_of_term-start_of_term+1;j++)
@@ -126,6 +140,7 @@ char** separating(char* str, int* size_sep_str){
 }
 
 char** slicing(int from, int to, char** sprt_str){
+    printf("(slicing): %d %d %p\n", from, to, sprt_str);
     int i,
         slice_size = to - from + 1;
     if(slice_size < 1){
@@ -133,14 +148,15 @@ char** slicing(int from, int to, char** sprt_str){
         exit(666);
     }
 
+    printf("slice_check1: %d\n", slice_size);
     char** box = malloc(slice_size * sizeof(char*));
-    //printf("slice_check: %d %p\n", slice_size, box);
+    printf("slice_check2: %p\n", box);
     for(i=from;i<=to;i++){
         box[i-from] = calloc(MAX_EXPRESSION_LENGTH, sizeof(char));
         //box[i-to] = sprt_str[i];
-        //printf("\tslice_for: %d %s %p\t\t", i, sprt_str[i], sprt_str[i]);
+        printf("\tslice_for: %d %s %p\t\t", i, sprt_str[i], sprt_str[i]);
         strcpy(box[i-from], sprt_str[i]);
-        //printf("cont: %s %p\n", box[i-from], box[i-from]);
+        printf("cont: %s %p\n", box[i-from], box[i-from]);
     }
     /*
     for(i=from;i<=to;i++){
