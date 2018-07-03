@@ -105,6 +105,7 @@ char* for_griha(int sprt_str_len, char** sprt_str){
     strcpy(comeback, "");
     for(i=0;i<sprt_str_len;i++)
         strcat(comeback, sprt_str[i]);
+    strcat(comeback, "0");
     return comeback;
 }
 
