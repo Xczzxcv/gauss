@@ -16,6 +16,7 @@ char** separating(char* str, int* size_sep_str);
 char** cutting_term(int term_ind, int term_len, int sprt_str_len, char*** ptr_to_sprt_str){
     //returns coeff before term (e.g. for "..-2*rt[3]*x*y+.." will return "-2*rt[3]") in form of array of strings (in this example {"-", "2", "*", "rt[3]"})
     //this function is designed for 'sprt_str' without '(' and ')'
+    char **sprt_str = *ptr_to_sprt_str;
     if(term_ind == 0){
         char **new_sprt_str = malloc((sprt_str_len-1) * sizeof(char*)),
             cff[] = "+";
@@ -98,6 +99,15 @@ void reduc(char** sprt_str, int num_elt){ // privedenie podobnyx
         }
     }
 }
+char* for_griha(int sprt_str_len, char** sprt_str){
+    int i, cmb_size = strlen(sprt_str[0]);
+    char *comeback = malloc(strlen(sprt_str[0]) * sizeof(char));
+    strcpy(comeback, "");
+    for(i=0;i<sprt_str_len;i++)
+        strcat(comeback, sprt_str[i]);
+    return comeback;
+}
+
 
 int main(){
     int num_elt;
@@ -108,7 +118,8 @@ int main(){
     puts("start of REDUC");
     reduc(sprt_str, num_elt);
     puts("end of REDUC");
-    cutting_term(4, 1, num_elt, sprt_str);
+    printf("test: %s\n", for_griha(num_elt, sprt_str));
+    //cutting_term(4, 1, num_elt, sprt_str);
     printf("num_elt2 %d\n", num_elt);
 
     puts("start");
