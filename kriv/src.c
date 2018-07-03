@@ -13,6 +13,7 @@ int* find_same_term(int ind_start, int num_elt, int len_term, char** term, char*
         arr_size = (num_elt - ind_start) / len_term + 1,
         arr_cntr = 0,
         *answers = calloc(arr_size, sizeof(int));
+    puts("(find_same_term)");
     printf("\t\tind_start: |%d|\n", ind_start);
     printf("\t\tnum_elt: |%d|\n", num_elt);
     printf("\t\tlen_term: |%d|\n", len_term);
@@ -21,8 +22,10 @@ int* find_same_term(int ind_start, int num_elt, int len_term, char** term, char*
         for(j=0;j<len_term;j++)
             if(strcmp(term[j], sprt_str[i+j]))
                 break;
+                //goto cont;
         answers[arr_cntr] = i;
         arr_cntr++;
+        //cont:
     }
     return answers;
 }
@@ -45,10 +48,10 @@ void reduc(char** sprt_str, int num_elt){ // privedenie podobnyx
             buff = slicing(start_of_term, i-1, sprt_str);
             end_of_term = i-1;
             arr_ind = find_same_term(i+1, num_elt, end_of_term-start_of_term+1, buff, sprt_str);
-//            for(j=0;j<;j++){
+            //for(j=0;j<;j++){
             //for(j=0;arr_ind[j]!=0;j++){
 
-  //          }
+            //}
             printf("%d %d %p\n", start_of_term, i-1, buff);
             printf("\t\t");
             for(int j=0;j<end_of_term-start_of_term+1;j++)
@@ -80,12 +83,13 @@ int main(){
     reduc(sprt_str, num_elt);
     puts("end of REDUC");
     printf("num_elt2 %d\n", num_elt);
-    /*
+
     puts("start");
     for(int i=0;i<num_elt;i++)
         printf("%d: %d |%s|\n", i, strlen(sprt_str[i]), sprt_str[i]);
     puts("end");
-    */
+
+    getchar();
 }
 
 int num_chrs(char* str, char* chrs){
@@ -147,7 +151,6 @@ char** slicing(int from, int to, char** sprt_str){
         puts("Wrong 'from' and/or 'to' came to 'slicing'.");
         exit(666);
     }
-
     printf("slice_check1: %d\n", slice_size);
     char** box = malloc(slice_size * sizeof(char*));
     printf("slice_check2: %p\n", box);
