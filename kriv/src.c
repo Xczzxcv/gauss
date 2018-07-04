@@ -13,45 +13,49 @@ int* find_same_terms(int ind_start, int num_elt, int len_term, char** term, char
 char** slicing(int from, int to, char** sprt_str);
 int num_chrs(char* str, char* chrs);
 char** separating(char* str, int* size_sep_str);
-char** cutting_term(int term_ind, int term_len, int sprt_str_len, char*** ptr_to_sprt_str){
+char** cutting_term(int term_ind, int term_len, int* ptr_to_num_elt, int* ptr_to_coeff_len, char*** ptr_to_sprt_str){
     //returns coeff before term (e.g. for "..-2*rt[3]*x*y+.." will return "-2*rt[3]") in form of array of strings (in this example {"-", "2", "*", "rt[3]"})
     //this function is designed for 'sprt_str' without '(' and ')'
-    char **sprt_str = *ptr_to_sprt_str;
+    int num_elt = *ptr_to_num_elt;
+    printf("cut_term(start): %d %d %d %p %p\n", term_ind, term_len, num_elt, ptr_to_sprt_str, *ptr_to_sprt_str);
     if(term_ind == 0){
-        char **new_sprt_str = malloc((sprt_str_len-1) * sizeof(char*)),
+        char **new_sprt_str = malloc((num_elt-1) * sizeof(char*)),
             cff[] = "+";
         new_sprt_str[0] = malloc(sizeof(cff));
         strcpy(new_sprt_str[0], cff);
     }
 
-    int i, j, coeff_len;
+    int i, j, coeff_len, cntr;
     char **coeff,
         stop_signs[] = "+-",
-        **new_sprt_str = malloc((sprt_str_len-term_len) * sizeof(char*));
+        **new_sprt_str = malloc((num_elt-term_len) * sizeof(char*));
 
     for(j=term_ind;j>0;j--){
-        printf("%d: |%s| %c\n", j, sprt_str[j], sprt_str[j][0]);
-        if(strchr(stop_signs, sprt_str[j][0]))
+        printf("%d: |%s| %c\n", j, (*ptr_to_sprt_str)[j], (*ptr_to_sprt_str)[j][0]);
+        if(strchr(stop_signs, (*ptr_to_sprt_str)[j][0]))
             break;
     }
     coeff_len = term_ind - j;
     if(coeff_len != 1)
         coeff_len--; // it's for '*' between term and coeff
-    printf("coeff_len: %d - %d = %d\n", term_ind, i, coeff_len);
-    coeff = slicing(j, j+coeff_len, sprt_str);
+    *ptr_to_coeff_len = coeff_len;
+    printf("coeff_len: %d - %d = %d\n", term_ind, j, coeff_len);
+    coeff = slicing(j, j+coeff_len-1, *ptr_to_sprt_str); // -1 because <= in 'for' condition
     for(i=j;i<j+coeff_len;i++){
-        printf("cff_in_sprt_str[%d]: |%s| real_cff[%d]: |%s|\n", i, sprt_str[i], i-j, coeff[i-j]);
+        printf("cff_in_*ptr_to_sprt_str[%d]: |%s| real_cff[%d]: |%s|\n", i, (*ptr_to_sprt_str)[i], i-j, coeff[i-j]);
     }
+    printf("%d elts to del:\n", term_ind+term_len-j);
+    (*ptr_to_num_elt) -= (term_ind + term_len - j);
+    printf("now in sprt_str %d elts\n", *ptr_to_num_elt);
     for(i=j;i<term_ind+term_len;i++){
-        printf("del[%d]: |%s|\n", i, sprt_str[i]);
+        printf("  del[%d]: |%s|\n", i, (*ptr_to_sprt_str)[i]);
     }
-    for(i=0;i<term_ind-coeff_len-(coeff_len!=1);i++) // (coeff_len != 1) is for '*' between term and coeff (if it is)
-        new_sprt_str[i] = sprt_str[i];
-    for(i=term_ind+term_len;i<sprt_str_len;i++)
-        new_sprt_str[i] = sprt_str[i];
-    sprt_str = new_sprt_str;
-
-    free(sprt_str);
+    for(i=0, cntr=0;i<term_ind-coeff_len-(coeff_len!=1);cntr++, i++) // (coeff_len != 1) is for '*' between term and coeff (if it is)
+        new_sprt_str[cntr] = (*ptr_to_sprt_str)[cntr];
+    for(i=term_ind+term_len;i<num_elt;cntr++, i++)
+        new_sprt_str[cntr] = (*ptr_to_sprt_str)[i];
+    printf("new_sprt_str: %p\n", new_sprt_str);
+    *ptr_to_sprt_str = new_sprt_str;
     return coeff;
 }
 void summing_same_terms(int inti_term_ind, int* arr_ind, int term_len, char** sprt_str){
@@ -99,16 +103,7 @@ void reduc(char** sprt_str, int num_elt){ // privedenie podobnyx
         }
     }
 }
-char* for_griha(int sprt_str_len, char** sprt_str){
-    int i, cmb_size = strlen(sprt_str[0]);
-    char *comeback = malloc(strlen(sprt_str[0]) * sizeof(char));
-    strcpy(comeback, "");
-    for(i=0;i<sprt_str_len;i++)
-        strcat(comeback, sprt_str[i]);
-    strcat(comeback, "0");
-    return comeback;
-}
-
+char* sprt_to_str(int sprt_str_len, char** sprt_str);
 
 int main(){
     int num_elt;
@@ -119,10 +114,12 @@ int main(){
     puts("start of REDUC");
     reduc(sprt_str, num_elt);
     puts("end of REDUC");
-    printf("test: %s\n", for_griha(num_elt, sprt_str));
-    //cutting_term(4, 1, num_elt, sprt_str);
+    printf("bfr: | %s | %p\n", sprt_to_str(num_elt, sprt_str), sprt_str);
+    int coeff_len;
+    char** coeff = cutting_term(4, 1, &num_elt, &coeff_len, &sprt_str);
+    printf("XX: %p\n", sprt_str);
+    printf("aft: | %s |\n", sprt_to_str(num_elt, sprt_str));
     printf("num_elt2 %d\n", num_elt);
-
     puts("start");
     for(int i=0;i<num_elt;i++)
         printf("%d: %d |%s|\n", i, strlen(sprt_str[i]), sprt_str[i]);
@@ -208,10 +205,13 @@ char** slicing(int from, int to, char** sprt_str){
     }
     */
     char **buff = malloc(slice_size * sizeof(char*));
+    printf("slice_bef_for-rec: %d\n", slice_size);
     for(int j=0;j<slice_size;j++){
         buff[j] = box[j];
         //strcpy(buff[j], box[j]);
-        printf("buff[%d]: |%s| %p\n", j, buff[j], buff[j]);
+        printf("buff[%d]: ", j);
+        printf("|%s| ", buff[j]);
+        printf("%p\n", buff[j]);
     }
     return buff;
 }
@@ -242,4 +242,14 @@ int* find_same_terms(int ind_start, int num_elt, int len_term, char** term, char
         cont:   ;
     }
     return answers;
+}
+
+char* sprt_to_str(int sprt_str_len, char** sprt_str){
+    int i, cmb_size = strlen(sprt_str[0]);
+    char *comeback = malloc(strlen(sprt_str[0]) * sizeof(char));
+    strcpy(comeback, "");
+    for(i=0;i<sprt_str_len;i++)
+        strcat(comeback, sprt_str[i]);
+    strcat(comeback, "0");
+    return comeback;
 }
