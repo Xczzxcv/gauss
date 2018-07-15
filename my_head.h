@@ -1,4 +1,4 @@
-#define MAX_NUM_LENGTH 10 //with minus
+#define MAX_NUM_LENGTH 6 //with minus
 #define N 3
 
 
@@ -25,6 +25,7 @@ frac sum_frac(frac fr1, frac fr2);
 frac sub_frac(frac fr1, frac fr2);
 frac div_frac(frac fr1, frac fr2);
 frac mult_frac(frac fr1, frac fr2);
+int are_equal_frac(frac fr1, frac fr2);
 frac inverse_frac(frac fr);
 frac create_frac(int num, int denom);
 int checking_det(int** ptM, int sizeM);
@@ -93,15 +94,15 @@ int** readM(){
     return ptM;
 }
 
-void show_intM(int** ptM, int sizeM, char* text){
+void show_intM(int** ptM, int rows, int cols, char* text){
     if (text == "")
         printf("\nThe Matrix of integers:\n");
     else{
         printf("%s", text);
     }
     int i, j;
-    for(i=0;i<sizeM;i++){
-        for(j=0;j<sizeM;j++)
+    for(i=0;i<rows;i++){
+        for(j=0;j<cols;j++)
             printf("%d ", ptM[i][j]);
         printf("\n");
     }
@@ -369,4 +370,8 @@ char* string_frac(frac fr){
 
 float frac_to_float(frac fr){
     return (float)fr.num / fr.denom;
+}
+
+int are_equal_frac(frac fr1, frac fr2){
+    return (fr1.num == fr2.num) && (fr1.denom == fr2.denom);
 }
