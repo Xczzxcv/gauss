@@ -49,7 +49,6 @@ char* stringP(Point* p){
 
 frac* determ_line_eqtn(Point* p1, Point* p2){
     //(x - p1->x) / (p2->x - p1->x) - (y-p1->y) / (p2->y-p1->y) = 0
-    printf("%s\n%s\n", stringP(p1), stringP(p2));
     frac A = div_frac(create_frac(1, 1), sub_frac(p2->x, p1->x)),
         B = div_frac(create_frac(-1, 1), sub_frac(p2->y, p1->y)),
         C = sub_frac( div_frac( p1->y, sub_frac(p2->y, p1->y) ),
@@ -58,8 +57,6 @@ frac* determ_line_eqtn(Point* p1, Point* p2){
     array[0] = A;
     array[1] = B;
     array[2] = C;
-    printf("d_l_eq: %s %s %s\n", string_frac(A), string_frac(B), string_frac(C));
-    printf("d_l_eq: %s %s %s\n", string_frac(array[0]), string_frac(array[1]), string_frac(array[2]));
     return array;
 }
 
@@ -68,7 +65,6 @@ frac* kx_plusb(frac A, frac B, frac C){
     //    y = (Ax+C) / -B
     //    y = (A/-B)x + C/-B
     //    k = A/-B, b = C/-B
-    printf("kx_plusb: %s %s %s\n", string_frac(A), string_frac(B), string_frac(C));
     frac k = div_frac(A, inverse_frac(B)),
         b = div_frac(C, inverse_frac(B));
     frac *array = malloc(2 * sizeof(frac));
