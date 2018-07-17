@@ -1,4 +1,4 @@
-#define MAX_NUM_LENGTH 6 //with minus
+#define MAX_NUM_LENGTH 8 //with minus
 #define N 3
 
 
@@ -9,7 +9,7 @@ typedef struct {
 
 
 int** readM();
-void show_intM(int** ptM, int sizeM, char* text);
+void show_intM(int** ptM, int rows, int cols, char* text);
 int** cutM(int row, int col, int** ptM);
 int find(int* mass, int size, int quest);
 void sum_strM(int str1, int str2, frac coeff, frac** pfrM, int sizestr);
@@ -25,6 +25,7 @@ frac sum_frac(frac fr1, frac fr2);
 frac sub_frac(frac fr1, frac fr2);
 frac div_frac(frac fr1, frac fr2);
 frac mult_frac(frac fr1, frac fr2);
+frac sqrt_frac(frac fr);
 int are_equal_frac(frac fr1, frac fr2);
 frac inverse_frac(frac fr);
 frac create_frac(int num, int denom);
@@ -33,6 +34,7 @@ void zero_issue(int problem_str, frac** pfrM, int rows, int cols);
 int** try_fracM_to_intM(frac** pfrM, int rows, int cols);
 char* string_frac(frac fr);
 float frac_to_float(frac fr);
+frac float_to_frac(float num);
 
 int** readM(){
     char answer; //'f' - file or 'c' - console
@@ -259,7 +261,7 @@ frac sub_frac(frac fr1, frac fr2){
 
 frac div_frac(frac fr1, frac fr2){
     if (fr2.num == 0){
-        printf("Divison by zero.\n");
+        printf("Divison by zero at %s %s.\n", string_frac(fr1), string_frac(fr2));
         exit(EXIT_FAILURE);
     }
     fr1.num *= fr2.denom;
@@ -374,4 +376,27 @@ float frac_to_float(frac fr){
 
 int are_equal_frac(frac fr1, frac fr2){
     return (fr1.num == fr2.num) && (fr1.denom == fr2.denom);
+}
+
+frac sqrt_frac(frac fr){
+    float box = frac_to_float(fr);
+    box = sqrt(box);
+    fr = float_to_frac(box);
+    return fr;
+}
+
+frac float_to_frac(float num){
+    int int_part = (int)num,
+        cnt = 0;
+    float float_part = num - (int)num,
+        prev;
+    frac box_fr;
+    do{
+        prev = float_part;
+        float_part *= 10;
+        cnt++;
+    }while(float_part != (int)float_part);
+    box_fr = create_frac((int)float_part, (int)(pow(10, cnt)+0.1));
+    box_fr = sum_frac( box_fr, create_frac(int_part, 1) );
+    return box_fr;
 }
