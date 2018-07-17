@@ -20,6 +20,51 @@ int** read_vars(int num_of_vars, char* filename);
 float round_fl(float num, int signs);
 int sqrt_int(int num, int sub, int cnt);
 frac cos_angle_betw_lines(frac* ABC1, frac* ABC2);
+frac* sub_ect(frac* coeffs1, frac* coeffs2, int length);
+frac* mult_eqt(frac* coeffs, int length, frac num);
+frac find_dist_PP(Point p1, Point p2);
+Point lines_intersec(frac* ABC1, frac* ABC2){
+    printf("\tINPUT\n");
+    printf("\tABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
+    printf("\tABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
+
+    int i,
+        lenABC = 3;
+    frac *ABCres[lenABC],
+        ABC1_cff, ABC2_cff,
+        x, y;
+    Point p_intersec;
+
+    ABC1_cff = ABC1[1];
+    ABC2_cff = ABC2[1];
+    ABC1 = mult_eqt(ABC1, lenABC, ABC2_cff);
+    ABC2 = mult_eqt(ABC2, lenABC, ABC1_cff);
+    printf("ABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
+    printf("ABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
+    ABC1 = sub_ect(ABC1, ABC2, lenABC);
+    printf("ABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
+    printf("ABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
+
+    x = div_frac(ABC1[2], inverse_frac(ABC1[0]));
+    y = sub_frac( inverse_frac( div_frac(ABC2[2], ABC2[1]) ), mult_frac(div_frac(ABC2[0], ABC2[1]), x));
+    p_intersec.x = x;
+    p_intersec.y = y;
+    printf("P_intersec: %s\n", stringP(p_intersec));
+    return p_intersec;
+}
+frac dist_lineP(frac* ABC, Point p){
+    frac distance,
+        *height_ABC = height_lineP(ABC, p);
+    Point p_intersec = lines_intersec(ABC, height_ABC);
+    printf("Let's find dist: (%s) | (%s)\n", stringP(p), stringP(p_intersec));
+    distance = find_dist_PP(p, p_intersec);
+    //printf("Distance: %f\n", frac_to_float(distance));
+    return distance;
+}
+frac alternative(frac* ABC, Point p){
+   return div_frac( modulo_frac( sum_frac( sum_frac( mult_frac(ABC[0], p.x), mult_frac(ABC[1], p.y) ), ABC[2] ) ),
+                   sqrt_frac( sum_frac( mult_frac(ABC[0], ABC[0]), mult_frac(ABC[1], ABC[1]) ) ) );
+}
 
 int main(){
 //    int M = 500;
@@ -37,7 +82,7 @@ int main(){
         num_of_vars = 4,
         **varsM = read_vars(num_of_vars, "vars.txt"); // txt-file must end with an empty string
 //    box = form_geron(num, start, cnt);
-//    printf("result: %s\n", string_frac(box));
+//    printf("result: %s\n", stringF(box));
 //    getch();
     show_intM(varsM, num_of_vars, 6, "\n");
     int i;
@@ -51,20 +96,43 @@ int main(){
         *kb = kx_plusb(ABC),
         *new_ABC = height_lineP(ABC, C);
     for(i=0;i<3;i++)
-        printf("ABC[%d]: %s\n", i, string_frac(ABC[i]));
+        printf("ABC[%d]: %s\n", i, stringF(ABC[i]));
     for(i=0;i<3;i++)
-        printf("new_ABC[%d]: %s\n", i, string_frac(new_ABC[i]));
+        printf("new_ABC[%d]: %s\n", i, stringF(new_ABC[i]));
     for(i=0;i<2;i++)
-        printf("kb[%d]: %s\n", i, string_frac(kb[i]));
+        printf("kb[%d]: %s\n", i, stringF(kb[i]));
 //    for(i=0;i<2;i++)
-//        printf("new_kb[%d]: %s\n", i, string_frac(new_kb[i]));
+//        printf("new_kb[%d]: %s\n", i, stringF(new_kb[i]));
     printf("A: %d %d\n", checkP_line_kb(kb, A), checkP_line_ABC(ABC, A));
     printf("B: %d %d\n", checkP_line_kb(kb, B), checkP_line_ABC(ABC, B));
     printf("C: %d %d\n", checkP_line_kb(kx_plusb(new_ABC), C), checkP_line_ABC(new_ABC, C));
     frac box = cos_angle_betw_lines(ABC, new_ABC);
     float box_fl = frac_to_float(box);
-    //printf("cos betw ABC & new_ABC: %s\n", string_frac(box));
+    //printf("cos betw ABC & new_ABC: %s\n", stringF(box));
     printf("angle betw ABC & new_ABC: acos(%f) = %f\n", box_fl, acos(box_fl)*180/M_PI);
+    printf("Distance betw AC and B: |%f|\n", frac_to_float( dist_lineP( find_line_eqtn(A, C), B) ) );
+    printf("Distance betw AC and B: |%f|\n", frac_to_float( alternative( find_line_eqtn(A, C), B) ) );
+}
+
+frac* sub_ect(frac* coeffs1, frac* coeffs2, int length){
+    int i;
+    for(i=0;i<length;i++){
+        printf("SUBcoeff %d: bef %s\t", i, stringF(coeffs1[i]));
+        coeffs1[i] = sub_frac(coeffs1[i], coeffs2[i]);
+        printf("aft %s\n", stringF(coeffs1[i]));
+    }
+    return coeffs1;
+}
+
+frac* mult_eqt(frac* coeffs, int length, frac num){
+    int i;
+    printf("NUM: %s\n", stringF(num));
+    for(i=0;i<length;i++){
+        printf("MULTcoeff %d: bef %s\t", i, stringF(coeffs[i]));
+        coeffs[i] = mult_frac(coeffs[i], num);
+        printf("aft %s\n", stringF(coeffs[i]));
+    }
+    return coeffs;
 }
 
 Point createP(int x, int y){
@@ -75,8 +143,8 @@ Point createP(int x, int y){
 }
 
 char* stringP(Point p){
-    char *box_str = malloc((strlen("x= y=") + 25*2) * sizeof(char));
-    sprintf(box_str, "x=%s y=%s", string_frac(p.x), string_frac(p.y));
+    char *box_str = malloc((strlen(" ") + 25*2) * sizeof(char));
+    sprintf(box_str, "%s %s", stringF(p.x), stringF(p.y));
     return box_str;
 }
 
@@ -127,20 +195,20 @@ int checkP_line_ABC(frac* ABC, Point p){
         B = ABC[1],
         C = ABC[2],
         box = create_frac(0, 1);
-    printf("chck_ln_ABC: %s %s %s\n", string_frac(A), string_frac(B), string_frac(C));
+    printf("chck_ln_ABC: %s %s %s\n", stringF(A), stringF(B), stringF(C));
     box = sum_frac(box, mult_frac(A, x));
-    //printf("box1: %s\n", string_frac(box));
+    //printf("box1: %s\n", stringF(box));
     box = sum_frac(box, mult_frac(B, y));
-    //printf("box2: %s\n", string_frac(box));
+    //printf("box2: %s\n", stringF(box));
     box = sum_frac(box, C);
-    //printf("box3: %s\n", string_frac(box));
+    //printf("box3: %s\n", stringF(box));
     return are_equal_frac(box, create_frac(0, 1));;
 }
 
 frac* height_lineP(frac* ABC, Point p){
 //    new_k = -k
 //    new_b = yp - xp * new_k
-    printf("HEIGHT INPUT: |%s %s %s|, %s, %s\n", string_frac(ABC[0]), string_frac(ABC[1]), string_frac(ABC[2]), string_frac(p.x), string_frac(p.y));
+    printf("HEIGHT INPUT: |%s %s %s|, %s, %s\n", stringF(ABC[0]), stringF(ABC[1]), stringF(ABC[2]), stringF(p.x), stringF(p.y));
     frac *new_ABC = malloc(3 * sizeof(frac)),
         A = ABC[0],
         B = ABC[1],
@@ -183,6 +251,13 @@ int** read_vars(int num_of_vars, char* filename){
     return vars;
 }
 
+frac find_dist_PP(Point p1, Point p2){
+    frac diff_x = sub_frac(p2.x, p1.x),
+        diff_y = sub_frac(p2.y, p1.y),
+        distance = sqrt_frac( sum_frac( mult_frac(diff_x, diff_x), mult_frac(diff_y, diff_y) ) );
+    return distance;
+}
+
 float round_fl(float num, int signs){
     num *= (int)(pow(10, signs)+0.1);
     num = floor(num+0.5);
@@ -209,18 +284,18 @@ frac cos_angle_betw_lines(frac* ABC1, frac* ABC2){
         A2 = ABC2[0],
         B2 = ABC2[1],
         C2 = ABC2[2];
-    //printf("%s %s %s %s %s %s\n", string_frac(A1), string_frac(B1), string_frac(C1), string_frac(A2), string_frac(B2), string_frac(C2));
+    //printf("%s %s %s %s %s %s\n", stringF(A1), stringF(B1), stringF(C1), stringF(A2), stringF(B2), stringF(C2));
     num = sum_frac( mult_frac(A1, A2), mult_frac(B1, B2) );
-    //printf("num: %s\n", string_frac(num));
+    //printf("num: %s\n", stringF(num));
     box1 = sum_frac( mult_frac(A1, A1), mult_frac(B1, B1));
     box2 = sum_frac( mult_frac(A2, A2), mult_frac(B2, B2) );
-    //printf("box1 %s box2 %s\n", string_frac(box1), string_frac(box2));
-    //printf("|%s %f| |%s %f|\n", string_frac(box1), frac_to_float(box1), string_frac(box2), frac_to_float(box2));
+    //printf("box1 %s box2 %s\n", stringF(box1), stringF(box2));
+    //printf("|%s %f| |%s %f|\n", stringF(box1), frac_to_float(box1), stringF(box2), frac_to_float(box2));
     denom = mult_frac( box1, box2 );
-    //printf("mult denom: %s\n", string_frac(denom));
+    //printf("mult denom: %s\n", stringF(denom));
     denom = sqrt_frac(denom);
-    //printf("aft sqrt denom: %s\n", string_frac(denom));
+    //printf("aft sqrt denom: %s\n", stringF(denom));
     result = div_frac(num, denom);
-    printf("%s : %s = %s\n", string_frac(num), string_frac(denom), string_frac(result));
+    printf("%s : %s = %s\n", stringF(num), stringF(denom), stringF(result));
     return result;
 }
