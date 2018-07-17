@@ -19,12 +19,13 @@ void extendingM(frac** pfrM, int sizeM);
 void zeroing(frac** pfrM, int rows, int cols); //size - num of rows
 int eukl_NOD(int a, int b);
 void swap_strM(int str1, int str2, frac** pfrM);
-void reduc_frac(frac** frac_ptr_mass, int mass_size); //сокращение дробей
+void reduc_frac(frac* frac_ptr); //сокращение дробей
 void make_invM(frac** pfrM, int rows, int cols);
 frac sum_frac(frac fr1, frac fr2);
 frac sub_frac(frac fr1, frac fr2);
 frac div_frac(frac fr1, frac fr2);
 frac mult_frac(frac fr1, frac fr2);
+frac modulo_frac(frac fr);
 frac sqrt_frac(frac fr);
 int are_equal_frac(frac fr1, frac fr2);
 frac inverse_frac(frac fr);
@@ -32,7 +33,7 @@ frac create_frac(int num, int denom);
 int checking_det(int** ptM, int sizeM);
 void zero_issue(int problem_str, frac** pfrM, int rows, int cols);
 int** try_fracM_to_intM(frac** pfrM, int rows, int cols);
-char* string_frac(frac fr);
+char* stringF(frac fr);
 float frac_to_float(frac fr);
 frac float_to_frac(float num);
 
@@ -226,13 +227,10 @@ void swap_strM(int str1, int str2, frac** pfrM){
     pfrM[str2] = box;
 }
 
-void reduc_frac(frac** frac_ptr_mass, int mass_size){
-    int i, NOD;
-    for (i=0;i<mass_size;i++){
-        NOD = eukl_NOD(frac_ptr_mass[i][0].num, frac_ptr_mass[i][0].denom);
-        frac_ptr_mass[i][0].num /= NOD;
-        frac_ptr_mass[i][0].denom /= NOD;
-    }
+void reduc_frac(frac* frac_ptr){
+    int NOD = eukl_NOD( frac_ptr->num, frac_ptr->denom );
+    frac_ptr->num /= NOD;
+    frac_ptr->denom /= NOD;
 }
 
 frac sum_frac(frac fr1, frac fr2){
@@ -242,8 +240,7 @@ frac sum_frac(frac fr1, frac fr2){
         fr1.num = fr1.num * fr2.denom + fr2.num * fr1.denom;
         fr1.denom *= fr2.denom;
     }
-    frac* mass[] = {&fr1};
-    reduc_frac(mass, 1);
+    reduc_frac(&fr1);
     return fr1;
 }
 
@@ -254,20 +251,18 @@ frac sub_frac(frac fr1, frac fr2){
         fr1.num = fr1.num * fr2.denom - fr2.num * fr1.denom;
         fr1.denom *= fr2.denom;
     }
-    frac* mass[] = {&fr1};
-    reduc_frac(mass, 1);
+    reduc_frac(&fr1);
     return fr1;
 }
 
 frac div_frac(frac fr1, frac fr2){
     if (fr2.num == 0){
-        printf("Divison by zero at %s %s.\n", string_frac(fr1), string_frac(fr2));
+        printf("Divison by zero at %s %s.\n", stringF(fr1), stringF(fr2));
         exit(EXIT_FAILURE);
     }
     fr1.num *= fr2.denom;
     fr1.denom *= fr2.num;
-    frac* mass[] = {&fr1};
-    reduc_frac(mass, 1);
+    reduc_frac(&fr1);
     if(fr1.denom < 0){
         fr1.num = -fr1.num;
         fr1.denom = -fr1.denom;
@@ -278,8 +273,7 @@ frac div_frac(frac fr1, frac fr2){
 frac mult_frac(frac fr1, frac fr2){
     fr1.num *= fr2.num;
     fr1.denom *= fr2.denom;
-    frac* mass[] = {&fr1};
-    reduc_frac(mass, 1);
+    reduc_frac(&fr1);
     return fr1;
 }
 
@@ -364,7 +358,7 @@ int** try_fracM_to_intM(frac** pfrM, int rows, int cols){
     return box;
 }
 
-char* string_frac(frac fr){
+char* stringF(frac fr){
     char* box_str = malloc(25 * sizeof(char));
     sprintf(box_str, "%d/%d", fr.num, fr.denom);
     return box_str;
@@ -404,4 +398,9 @@ frac float_to_frac(float num){
     box_fr = create_frac((int)float_part, (int)(pow(10, cnt)+0.1));
     box_fr = sum_frac( box_fr, create_frac(int_part, 1) );
     return box_fr;
+}
+
+frac modulo_frac(frac fr){
+    if (fr.num < 0 || fr.denom <0)
+        return inverse_frac(fr);
 }
