@@ -18,28 +18,8 @@ int checkP_line_ABC(frac* ABC, Point p);
 frac* height_lineP(frac* kb, Point p);
 int** read_vars(int num_of_vars, char* filename);
 float round_fl(float num, int signs);
-frac float_to_frac(float num);
 int sqrt_int(int num, int sub, int cnt);
-frac sqrt_frac(frac fr);
-frac cos_angle_betw_lines(frac* ABC1, frac* ABC2){
-    frac num, denom, result, box,
-        A1 = ABC1[0],
-        B1 = ABC1[1],
-        C1 = ABC1[2],
-        A2 = ABC2[0],
-        B2 = ABC2[1],
-        C2 = ABC2[2],
-        one = create_frac(1, 1);
-    num = sum_frac( mult_frac(A1, A2), mult_frac(B1, B2) );
-    box = sum_frac( mult_frac(A1, A1), mult_frac(B1, B1));
-    printf("sqrt(%s) = ", string_frac(box));
-    denom = sqrt_frac(box);
-    printf("%s\n", string_frac(denom));
-    denom = mult_frac( denom, sqrt_frac( sum_frac( mult_frac(A2, A2), mult_frac(B2, B2) ) ) );
-    result = div_frac(num, denom);
-    printf("%s : %s = %s\n", string_frac(num), string_frac(denom), string_frac(result));
-    return result;
-}
+frac cos_angle_betw_lines(frac* ABC1, frac* ABC2);
 
 int main(){
 //    int M = 500;
@@ -69,7 +49,7 @@ int main(){
     printf("C: |%s|\n", stringP(C));
     frac *ABC = find_line_eqtn(A, B),
         *kb = kx_plusb(ABC),
-        *new_ABC = height_lineP(ABC, A);
+        *new_ABC = height_lineP(ABC, C);
     for(i=0;i<3;i++)
         printf("ABC[%d]: %s\n", i, string_frac(ABC[i]));
     for(i=0;i<3;i++)
@@ -80,11 +60,11 @@ int main(){
 //        printf("new_kb[%d]: %s\n", i, string_frac(new_kb[i]));
     printf("A: %d %d\n", checkP_line_kb(kb, A), checkP_line_ABC(ABC, A));
     printf("B: %d %d\n", checkP_line_kb(kb, B), checkP_line_ABC(ABC, B));
-    printf("C: %d %d\n", checkP_line_kb(new_ABC, C), checkP_line_ABC(new_ABC, C));
+    printf("C: %d %d\n", checkP_line_kb(kx_plusb(new_ABC), C), checkP_line_ABC(new_ABC, C));
     frac box = cos_angle_betw_lines(ABC, new_ABC);
-    float box_fl = (float)box.num / box.denom;
-    printf("cos betw ABC & new_ABC: %s\n", string_frac(box));
-    printf("angle betw ABC & new_ABC: acos(%f) = %f\n", box_fl, acos(box_fl));
+    float box_fl = frac_to_float(box);
+    //printf("cos betw ABC & new_ABC: %s\n", string_frac(box));
+    printf("angle betw ABC & new_ABC: acos(%f) = %f\n", box_fl, acos(box_fl)*180/M_PI);
 }
 
 Point createP(int x, int y){
@@ -105,7 +85,6 @@ frac* find_line_eqtn(Point p1, Point p2){
     //formula on listochek u me est'
     frac denom = sub_frac(p2.x, p1.x);
     if (denom.num == 0);
-    printf("test: %s %s\n", string_frac(p2.x), string_frac(p1.x));
     frac A = div_frac(create_frac(1, 1), denom),
         B = div_frac(create_frac(-1, 1), sub_frac(p2.y, p1.y)),
         C = sub_frac( div_frac( p1.y, sub_frac(p2.y, p1.y) ),
@@ -157,36 +136,18 @@ int checkP_line_ABC(frac* ABC, Point p){
     //printf("box3: %s\n", string_frac(box));
     return are_equal_frac(box, create_frac(0, 1));;
 }
-/*
-frac* height_lineP(frac* ABC, Point p){
-//    A(y-y1)-B(x-x1)=0
-//    Ay - Ay1 - Bx + Bx1 = 0
-//    -Bx + Ay + (Bx1 - Ay1) = 0
-    frac A = ABC[0],
-        B = ABC[1],
-        C = ABC[2],
-        *new_ABC = malloc(3 * sizeof(frac));
-    new_ABC[0] = inverse_frac(B); // new_A
-    new_ABC[1] = A; // new_B
-    new_ABC[2] = sub_frac( mult_frac(B, p.x), mult_frac(A, p.y) ); // new_C
-    return new_ABC;
-}
-*/
 
 frac* height_lineP(frac* ABC, Point p){
 //    new_k = -k
 //    new_b = yp - xp * new_k
+    printf("HEIGHT INPUT: |%s %s %s|, %s, %s\n", string_frac(ABC[0]), string_frac(ABC[1]), string_frac(ABC[2]), string_frac(p.x), string_frac(p.y));
     frac *new_ABC = malloc(3 * sizeof(frac)),
-        *kb = kx_plusb(ABC),
-        k = kb[0],
-        b = kb[1],
-        *new_kb = malloc(2 * sizeof(frac));
-    new_kb[0] = inverse_frac(k); // new_k
-    new_kb[1] = sub_frac( p.y, mult_frac(p.x, inverse_frac(k)) ); // new_b
-    new_ABC[0] = create_frac(-k.num, 1); // new_A
-    new_ABC[1] = create_frac(-k.denom, 1); // new_B
-    new_ABC[2] = create_frac(-b.num, 1); // new_C
-    printf("||||%s %s\n", string_frac(new_kb[0]), string_frac(new_kb[1]));
+        A = ABC[0],
+        B = ABC[1],
+        C = ABC[2];
+    new_ABC[0] = inverse_frac(B); // new_A
+    new_ABC[1] = A; // new_B
+    new_ABC[2] = sub_frac( mult_frac(B, p.x), mult_frac(A, p.y) ); // new_C
     return new_ABC;
 }
 
@@ -229,22 +190,6 @@ float round_fl(float num, int signs){
     return num;
 }
 
-frac float_to_frac(float num){
-    int int_part = (int)num,
-        cnt = 0;
-    float float_part = num - (int)num,
-        prev;
-    frac box_fr;
-    do{
-        prev = float_part;
-        float_part *= 10;
-        cnt++;
-    }while(float_part != (int)float_part);
-    box_fr = create_frac((int)float_part, (int)(pow(10, cnt)+0.1));
-    box_fr = sum_frac( box_fr, create_frac(int_part, 1) );
-    return box_fr;
-}
-
 int sqrt_int(int num, int sub, int cnt){
     num = num - sub;
     if (num <= 0)
@@ -256,26 +201,26 @@ int sqrt_int(int num, int sub, int cnt){
     }
 }
 
-frac sqrt_frac(frac fr){
-    float box = (float)fr.num / fr.denom;
-    box = sqrt(box);
-    fr = float_to_frac(box);
-    return fr;
+frac cos_angle_betw_lines(frac* ABC1, frac* ABC2){
+    frac num, denom, result, box1, box2,
+        A1 = ABC1[0],
+        B1 = ABC1[1],
+        C1 = ABC1[2],
+        A2 = ABC2[0],
+        B2 = ABC2[1],
+        C2 = ABC2[2];
+    //printf("%s %s %s %s %s %s\n", string_frac(A1), string_frac(B1), string_frac(C1), string_frac(A2), string_frac(B2), string_frac(C2));
+    num = sum_frac( mult_frac(A1, A2), mult_frac(B1, B2) );
+    //printf("num: %s\n", string_frac(num));
+    box1 = sum_frac( mult_frac(A1, A1), mult_frac(B1, B1));
+    box2 = sum_frac( mult_frac(A2, A2), mult_frac(B2, B2) );
+    //printf("box1 %s box2 %s\n", string_frac(box1), string_frac(box2));
+    //printf("|%s %f| |%s %f|\n", string_frac(box1), frac_to_float(box1), string_frac(box2), frac_to_float(box2));
+    denom = mult_frac( box1, box2 );
+    //printf("mult denom: %s\n", string_frac(denom));
+    denom = sqrt_frac(denom);
+    //printf("aft sqrt denom: %s\n", string_frac(denom));
+    result = div_frac(num, denom);
+    printf("%s : %s = %s\n", string_frac(num), string_frac(denom), string_frac(result));
+    return result;
 }
-/*
-frac form_geron(frac num, frac prev, int cnt){
-    printf("ger: %s %s %d\n", string_frac(num), string_frac(prev), cnt);
-    if (cnt > 0){
-        frac next;
-        next = div_frac(num, prev);
-        printf("next1: %s\n", string_frac(next));
-        next = sum_frac(prev, next);
-        printf("next2: %s\n", string_frac(next));
-        next = mult_frac(create_frac(1, 2), next);
-        printf("next3: %s\n", string_frac(next));
-        return form_geron(num, next, --cnt);
-    }
-    else
-        return prev;
-}
-*/

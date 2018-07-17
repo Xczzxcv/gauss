@@ -379,13 +379,18 @@ int are_equal_frac(frac fr1, frac fr2){
 }
 
 frac sqrt_frac(frac fr){
-    float box = frac_to_float(fr);
-    box = sqrt(box);
-    fr = float_to_frac(box);
+    float box_num = (float)fr.num,
+        box_denom = (float)fr.denom;
+    box_num = sqrt(box_num);
+    box_denom = sqrt(box_denom);
+    fr = div_frac( float_to_frac(box_num), float_to_frac(box_denom) );
     return fr;
 }
 
 frac float_to_frac(float num){
+    if (num == (int)num)
+        return create_frac((int)num, 1);
+
     int int_part = (int)num,
         cnt = 0;
     float float_part = num - (int)num,
