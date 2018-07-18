@@ -23,48 +23,9 @@ frac cos_angle_betw_lines(frac* ABC1, frac* ABC2);
 frac* sub_ect(frac* coeffs1, frac* coeffs2, int length);
 frac* mult_eqt(frac* coeffs, int length, frac num);
 frac find_dist_PP(Point p1, Point p2);
-Point lines_intersec(frac* ABC1, frac* ABC2){
-    printf("\tINPUT\n");
-    printf("\tABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
-    printf("\tABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
-
-    int i,
-        lenABC = 3;
-    frac *ABCres[lenABC],
-        ABC1_cff, ABC2_cff,
-        x, y;
-    Point p_intersec;
-
-    ABC1_cff = ABC1[1];
-    ABC2_cff = ABC2[1];
-    ABC1 = mult_eqt(ABC1, lenABC, ABC2_cff);
-    ABC2 = mult_eqt(ABC2, lenABC, ABC1_cff);
-    printf("ABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
-    printf("ABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
-    ABC1 = sub_ect(ABC1, ABC2, lenABC);
-    printf("ABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
-    printf("ABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
-
-    x = div_frac(ABC1[2], inverse_frac(ABC1[0]));
-    y = sub_frac( inverse_frac( div_frac(ABC2[2], ABC2[1]) ), mult_frac(div_frac(ABC2[0], ABC2[1]), x));
-    p_intersec.x = x;
-    p_intersec.y = y;
-    printf("P_intersec: %s\n", stringP(p_intersec));
-    return p_intersec;
-}
-frac dist_lineP(frac* ABC, Point p){
-    frac distance,
-        *height_ABC = height_lineP(ABC, p);
-    Point p_intersec = lines_intersec(ABC, height_ABC);
-    printf("Let's find dist: (%s) | (%s)\n", stringP(p), stringP(p_intersec));
-    distance = find_dist_PP(p, p_intersec);
-    //printf("Distance: %f\n", frac_to_float(distance));
-    return distance;
-}
-frac alternative(frac* ABC, Point p){
-    return div_frac( modulo_frac( sum_frac( sum_frac( mult_frac(ABC[0], p.x), mult_frac(ABC[1], p.y) ), ABC[2] ) ),
-                   sqrt_frac( sum_frac( mult_frac(ABC[0], ABC[0]), mult_frac(ABC[1], ABC[1]) ) ) );
-}
+Point lines_intersec(frac* ABC1, frac* ABC2);
+frac dist_lineP(frac* ABC, Point p);
+frac alternative(frac* ABC, Point p);
 
 int main(){
     int i, curr_var = -1,
@@ -101,6 +62,51 @@ int main(){
 //        printf("angle betw ABC & new_ABC: acos(%f) = %f\n", box_fl, acos(box_fl)*180/M_PI);
     printf("\tDistance betw AC and B: \t|%f|\n", frac_to_float( dist_lineP( find_line_eqtn(A, C), B) ) );
     printf("\tDistance betw AC and B: \t|%f|\n", frac_to_float( alternative( find_line_eqtn(A, C), B) ) );
+}
+
+Point lines_intersec(frac* ABC1, frac* ABC2){
+    printf("\tINPUT\n");
+    printf("\tABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
+    printf("\tABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
+
+    int i,
+        lenABC = 3;
+    frac *ABCres[lenABC],
+        ABC1_cff, ABC2_cff,
+        x, y;
+    Point p_intersec;
+
+    ABC1_cff = ABC1[1];
+    ABC2_cff = ABC2[1];
+    ABC1 = mult_eqt(ABC1, lenABC, ABC2_cff);
+    ABC2 = mult_eqt(ABC2, lenABC, ABC1_cff);
+    printf("ABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
+    printf("ABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
+    ABC1 = sub_ect(ABC1, ABC2, lenABC);
+    printf("ABC1: %s %s %s\t", stringF(ABC1[0]), stringF(ABC1[1]), stringF(ABC1[2]));
+    printf("ABC2: %s %s %s\n", stringF(ABC2[0]), stringF(ABC2[1]), stringF(ABC2[2]));
+
+    x = div_frac(ABC1[2], inverse_frac(ABC1[0]));
+    y = sub_frac( inverse_frac( div_frac(ABC2[2], ABC2[1]) ), mult_frac(div_frac(ABC2[0], ABC2[1]), x));
+    p_intersec.x = x;
+    p_intersec.y = y;
+    printf("P_intersec: %s\n", stringP(p_intersec));
+    return p_intersec;
+}
+
+frac dist_lineP(frac* ABC, Point p){
+    frac distance,
+        *height_ABC = height_lineP(ABC, p);
+    Point p_intersec = lines_intersec(ABC, height_ABC);
+    printf("Let's find dist: (%s) | (%s)\n", stringP(p), stringP(p_intersec));
+    distance = find_dist_PP(p, p_intersec);
+    //printf("Distance: %f\n", frac_to_float(distance));
+    return distance;
+}
+
+frac alternative(frac* ABC, Point p){
+    return div_frac( modulo_frac( sum_frac( sum_frac( mult_frac(ABC[0], p.x), mult_frac(ABC[1], p.y) ), ABC[2] ) ),
+                   sqrt_frac( sum_frac( mult_frac(ABC[0], ABC[0]), mult_frac(ABC[1], ABC[1]) ) ) );
 }
 
 frac* sub_ect(frac* coeffs1, frac* coeffs2, int length){
