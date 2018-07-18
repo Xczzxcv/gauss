@@ -16,7 +16,7 @@ frac* kx_plusb(frac* ABC);
 int checkP_line_kb(frac* kb, Point p);
 int checkP_line_ABC(frac* ABC, Point p);
 frac* height_lineP(frac* kb, Point p);
-int** read_vars(int num_of_vars, char* filename);
+long long int** read_vars(int* vars_num, char* filename);
 float round_fl(float num, int signs);
 int sqrt_int(int num, int sub, int cnt);
 frac cos_angle_betw_lines(frac* ABC1, frac* ABC2);
@@ -62,56 +62,45 @@ frac dist_lineP(frac* ABC, Point p){
     return distance;
 }
 frac alternative(frac* ABC, Point p){
-   return div_frac( modulo_frac( sum_frac( sum_frac( mult_frac(ABC[0], p.x), mult_frac(ABC[1], p.y) ), ABC[2] ) ),
+    return div_frac( modulo_frac( sum_frac( sum_frac( mult_frac(ABC[0], p.x), mult_frac(ABC[1], p.y) ), ABC[2] ) ),
                    sqrt_frac( sum_frac( mult_frac(ABC[0], ABC[0]), mult_frac(ABC[1], ABC[1]) ) ) );
 }
 
 int main(){
-//    int M = 500;
-//    int res, from;
-//    for(int i=1;i<=M;i++){
-//        from = i;
-//        res = sqrt_int(from, 1, 1);
-//        printf("res: sqrt(%d) = %d\n", from, res);
-//    }
-//    getch();
-//    frac  box,
-//        start = create_frac(10, 1),
-//        num = create_frac(9, 1);
-    int cnt = 10,
-        num_of_vars = 4,
-        **varsM = read_vars(num_of_vars, "vars.txt"); // txt-file must end with an empty string
-//    box = form_geron(num, start, cnt);
-//    printf("result: %s\n", stringF(box));
-//    getch();
-    show_intM(varsM, num_of_vars, 6, "\n");
-    int i;
-    Point A = createP(1, 4),
-        B = createP(3, -5),
-        C = createP(3, 2);
+    int i, curr_var = -1,
+        num_of_vars = 0;
+    long long int **varsM = read_vars(&num_of_vars, "vars.txt"); // txt-file must end with an empty string
+    //show_intM(varsM, num_of_vars, 6, "\n");
+    printf("Kakoi variant jelaete reshit'? (1-%d)\n", num_of_vars);
+    scanf("%d", &curr_var);
+    printf("\t\tVAR %d\n", curr_var);
+    curr_var--; // real shit
+    Point A = createP(varsM[curr_var][0], varsM[curr_var][1]),
+        B = createP(varsM[curr_var][2], varsM[curr_var][3]),
+        C = createP(varsM[curr_var][4], varsM[curr_var][5]);
     printf("A: |%s|\n", stringP(A));
     printf("B: |%s|\n", stringP(B));
     printf("C: |%s|\n", stringP(C));
-    frac *ABC = find_line_eqtn(A, B),
-        *kb = kx_plusb(ABC),
-        *new_ABC = height_lineP(ABC, C);
-    for(i=0;i<3;i++)
-        printf("ABC[%d]: %s\n", i, stringF(ABC[i]));
-    for(i=0;i<3;i++)
-        printf("new_ABC[%d]: %s\n", i, stringF(new_ABC[i]));
-    for(i=0;i<2;i++)
-        printf("kb[%d]: %s\n", i, stringF(kb[i]));
+//        frac *ABC = find_line_eqtn(A, B),
+//            *kb = kx_plusb(ABC),
+//            *new_ABC = height_lineP(ABC, C);
+//        for(i=0;i<3;i++)
+//            printf("ABC[%d]: %s\n", i, stringF(ABC[i]));
+//        for(i=0;i<3;i++)
+//            printf("new_ABC[%d]: %s\n", i, stringF(new_ABC[i]));
+//        for(i=0;i<2;i++)
+//            printf("kb[%d]: %s\n", i, stringF(kb[i]));
 //    for(i=0;i<2;i++)
 //        printf("new_kb[%d]: %s\n", i, stringF(new_kb[i]));
-    printf("A: %d %d\n", checkP_line_kb(kb, A), checkP_line_ABC(ABC, A));
-    printf("B: %d %d\n", checkP_line_kb(kb, B), checkP_line_ABC(ABC, B));
-    printf("C: %d %d\n", checkP_line_kb(kx_plusb(new_ABC), C), checkP_line_ABC(new_ABC, C));
-    frac box = cos_angle_betw_lines(ABC, new_ABC);
-    float box_fl = frac_to_float(box);
+//        printf("A: %d %d\n", checkP_line_kb(kb, A), checkP_line_ABC(ABC, A));
+//        printf("B: %d %d\n", checkP_line_kb(kb, B), checkP_line_ABC(ABC, B));
+//        printf("C: %d %d\n", checkP_line_kb(kx_plusb(new_ABC), C), checkP_line_ABC(new_ABC, C));
+//        frac box = cos_angle_betw_lines(ABC, new_ABC);
+//        float box_fl = frac_to_float(box);
     //printf("cos betw ABC & new_ABC: %s\n", stringF(box));
-    printf("angle betw ABC & new_ABC: acos(%f) = %f\n", box_fl, acos(box_fl)*180/M_PI);
-    printf("Distance betw AC and B: |%f|\n", frac_to_float( dist_lineP( find_line_eqtn(A, C), B) ) );
-    printf("Distance betw AC and B: |%f|\n", frac_to_float( alternative( find_line_eqtn(A, C), B) ) );
+//        printf("angle betw ABC & new_ABC: acos(%f) = %f\n", box_fl, acos(box_fl)*180/M_PI);
+    printf("\tDistance betw AC and B: \t|%f|\n", frac_to_float( dist_lineP( find_line_eqtn(A, C), B) ) );
+    printf("\tDistance betw AC and B: \t|%f|\n", frac_to_float( alternative( find_line_eqtn(A, C), B) ) );
 }
 
 frac* sub_ect(frac* coeffs1, frac* coeffs2, int length){
@@ -143,7 +132,7 @@ Point createP(int x, int y){
 }
 
 char* stringP(Point p){
-    char *box_str = malloc((strlen(" ") + 25*2) * sizeof(char));
+    char *box_str = malloc((strlen(" ") + 45*2) * sizeof(char));
     sprintf(box_str, "%s %s", stringF(p.x), stringF(p.y));
     return box_str;
 }
@@ -219,19 +208,23 @@ frac* height_lineP(frac* ABC, Point p){
     return new_ABC;
 }
 
-int** read_vars(int num_of_vars, char* filename){
+long long int** read_vars(int* vars_num, char* filename){
     FILE *Fvars = fopen(filename, "r");
     if (!Fvars){
         printf("Can't open %s. Program will stopped.\n", filename);
         exit(666);
     }
 
-    int i, j, box_cntr,
-        **vars = malloc(num_of_vars * sizeof(int*));
-    char ch,
+    int i, j, box_cntr, num_of_vars;
+    char vars_cnt[5],
+        ch,
         box_str[MAX_NUM_LENGTH];
+
+    *vars_num = atoi( fgets(vars_cnt, 5, Fvars) );
+    num_of_vars = *vars_num;
+    long long int **vars = malloc(num_of_vars * sizeof(long long int*));
     for(i=0;i<num_of_vars;i++){
-        vars[i] =  malloc(6 * sizeof(int));
+        vars[i] =  malloc(6 * sizeof(long long int));
         j = 0;
         box_cntr = 0;
         do{
@@ -254,7 +247,12 @@ int** read_vars(int num_of_vars, char* filename){
 frac find_dist_PP(Point p1, Point p2){
     frac diff_x = sub_frac(p2.x, p1.x),
         diff_y = sub_frac(p2.y, p1.y),
-        distance = sqrt_frac( sum_frac( mult_frac(diff_x, diff_x), mult_frac(diff_y, diff_y) ) );
+        distance;
+    distance = sum_frac( mult_frac(diff_x, diff_x), mult_frac(diff_y, diff_y) );
+    printf("inTEST %s\n", stringF(distance));
+    distance = sqrt_frac( distance );
+    printf("find_dist_PP: p1(%s) p2(%s)\t", stringP(p1), stringP(p2));
+    printf("%s %s |= %s\n", stringF(diff_x), stringF(diff_y), stringF(distance));
     return distance;
 }
 

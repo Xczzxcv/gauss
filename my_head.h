@@ -3,10 +3,9 @@
 
 
 typedef struct {
-    int num; //числитель
-    int denom; //знаменатель
+    long long int num; //числитель
+    long long int denom; //знаменатель
 }frac; //fraction - дробь, лол
-
 
 int** readM();
 void show_intM(int** ptM, int rows, int cols, char* text);
@@ -29,7 +28,7 @@ frac modulo_frac(frac fr);
 frac sqrt_frac(frac fr);
 int are_equal_frac(frac fr1, frac fr2);
 frac inverse_frac(frac fr);
-frac create_frac(int num, int denom);
+frac create_frac(long long int num, long long int denom);
 int checking_det(int** ptM, int sizeM);
 void zero_issue(int problem_str, frac** pfrM, int rows, int cols);
 int** try_fracM_to_intM(frac** pfrM, int rows, int cols);
@@ -179,7 +178,7 @@ void show_fracM(frac** pfrM, int rows, int cols, char* text){
     int i, j;
     for(i=0;i<rows;i++){
         for(j=0;j<cols;j++)
-            printf("%d/%d ", pfrM[i][j].num, pfrM[i][j].denom);
+            printf("%s ", stringF(pfrM[i][j]));
         printf("\n");
     }
     printf("\n");
@@ -282,7 +281,7 @@ frac inverse_frac(frac fr){
     return fr;
 }
 
-frac create_frac(int num, int denom){
+frac create_frac(long long int num, long long int denom){
     frac box;
     box.num = num;
     box.denom = denom;
@@ -304,7 +303,7 @@ void zeroing(frac** pfrM, int rows, int cols){
                 if (pfrM[j][i].num == 0)
                     continue;
                 cff = div_frac(pfrM[j][i], pfrM[i][i]);
-                printf("We're subtracting %d string from %d (%d string was multiplied by %d/%d)\n", i+1, j+1, i+1, cff.num, cff.denom);
+                printf("We're subtracting %d string from %d (%d string was multiplied by %s)\n", i+1, j+1, i+1, stringF(cff));
                 cff.num = -cff.num; //for vychitanie strok
                 sum_strM(j, i, cff, pfrM, cols);
                 show_fracM(pfrM, rows, cols, "Result:\n");
@@ -314,7 +313,7 @@ void zeroing(frac** pfrM, int rows, int cols){
 
     for(i=0;i<rows;i++){
         cff = div_frac(create_frac(1, 1), pfrM[i][i]);
-        printf("We multiplyed %d string by %d/%d\n", i+1, cff.num, cff.denom);
+        printf("We multiplyed %d string by %s\n", i+1, stringF(cff));
         for (j=0;j<cols;j++)
             pfrM[i][j] = mult_frac(pfrM[i][j], cff);
         show_fracM(pfrM, rows, cols, "Result:\n");
@@ -359,8 +358,8 @@ int** try_fracM_to_intM(frac** pfrM, int rows, int cols){
 }
 
 char* stringF(frac fr){
-    char* box_str = malloc(25 * sizeof(char));
-    sprintf(box_str, "%d/%d", fr.num, fr.denom);
+    char* box_str = malloc(22*2 * sizeof(char));
+    sprintf(box_str, "%lli/%lli", fr.num, fr.denom);
     return box_str;
 }
 
@@ -403,4 +402,6 @@ frac float_to_frac(float num){
 frac modulo_frac(frac fr){
     if (fr.num < 0 || fr.denom <0)
         return inverse_frac(fr);
+    else
+        return fr;
 }
