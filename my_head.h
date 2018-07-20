@@ -358,8 +358,14 @@ int** try_fracM_to_intM(frac** pfrM, int rows, int cols){
 }
 
 char* stringF(frac fr){
-    char* box_str = malloc(22*2 * sizeof(char));
-    sprintf(box_str, "%lli/%lli", fr.num, fr.denom);
+    if(fr.denom == 1){
+        char * box_str = malloc(22*2 * sizeof(char));
+        sprintf(box_str, "%lli", fr.num);
+    }
+    else{
+        char* box_str = malloc(22*2 * sizeof(char));
+        sprintf(box_str, "%lli/%lli", fr.num, fr.denom);
+    }
     return box_str;
 }
 
