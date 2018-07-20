@@ -359,7 +359,7 @@ int** try_fracM_to_intM(frac** pfrM, int rows, int cols){
 
 char* stringF(frac fr){
     if(fr.denom == 1){
-        char * box_str = malloc(12 * sizeof(char));
+        char* box_str = malloc(12 * sizeof(char));
         sprintf(box_str, "%lli", fr.num);
     }
     else{
